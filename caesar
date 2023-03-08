@@ -1,1 +1,34 @@
 #!/bin/bash
+
+
+
+
+# we want caesar to take in parameters and then trim the required ammount
+# We will find out what to trim by calling the create_pattern file and storing its output
+
+let uppercase=1
+let offset=0
+while getopts k:u flag
+do
+	case "${flag}" in
+		k)offset=${OPTARG};;
+		u)uppercase=0;;
+	esac
+done
+
+declare pattern;
+
+if ((uppercase==0))
+then
+	bash create_pattern -k ${offset} | read pattern
+else 
+ 	bash create_pattern -k ${offset} -u | read pattern
+fi
+
+echo "${pattern}"
+
+#while read -r line
+#do
+#	echo line | tr 'A-Z' ${pattern}
+#done
+#echo "fun"
