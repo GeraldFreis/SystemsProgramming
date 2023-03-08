@@ -9,8 +9,6 @@ touch sorted.txt
 
 cat f1.txt >> sorted.txt
 cat f2.txt >> sorted.txt
-
 sort -d -f sorted.txt > output.txt
 
-head -n 3 "output.txt"
-
+head -n 3 output.txt

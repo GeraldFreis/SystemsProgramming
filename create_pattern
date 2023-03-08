@@ -1,0 +1,36 @@
+#!/bin/bash
+
+
+# for this function we want to take two parameters k and u
+
+uppercase=1
+offset=0
+while getopts k:u flag
+do
+	case "${flag}" in 
+		k) offset=${OPTARG};;
+		u) uppercase=0;;
+	esac
+done
+
+# echo "$offset"
+# echo "$uppercase"
+
+# if uppercase is true then our values range from 65-90: with an increment of 1
+if (($uppercase==0))
+then
+	let offset_upper=($offset)
+	let offset_lower=$offset-1
+	declare -a alpharr=( A B C D E F G H I J K L M N O P Q R S T U V W X Y Z);
+	echo "${alpharr[$offset]}-ZA-${alpharr[$offset_lower]}"
+fi
+
+
+# if uppercase is false then our values range from 97-122
+if (($uppercase==1))
+then
+	declare -a alpharr=( a b c d e f g h i j k l m n o p q r s t u v w x y z );
+	echo "${alpharr[$offsset]}-za-${alpharr[$offset-1]}"
+fi
+
+
