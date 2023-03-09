@@ -30,7 +30,7 @@ fi
 if (($uppercase==1))
 then
 	declare -a alpharr=( a b c d e f g h i j k l m n o p q r s t u v w x y z );
-	echo "${alpharr[$offsset]}-za-${alpharr[$offset-1]}"
+	echo "${alpharr[$offset]}-za-${alpharr[$offset-1]}"
 fi
 
 
