@@ -6,11 +6,6 @@
 # we want caesar to take in parameters and then trim the required ammount
 # We will find out what to trim by calling the create_pattern file and storing its output
 
-#!/bin/bash
-
-
-# for this function we want to take two parameters k and u
-
 uppercase=1
 offset=0
 while getopts k:u flag
@@ -21,17 +16,16 @@ do
 	esac
 done
 
-# echo "$offset"
-# echo "$uppercase"
+
 declare pattern;
 # if uppercase is true then our values range from 65-90: with an increment of 1
 if (($uppercase==0))
 then
 	pattern=$(./create_pattern -k ${offset} -u);
+	# echo $pattern
 	while IFS= read -r line
 	do
-
-		echo ${line} | tr '[A-Z]' '[${pattern}]'
+		echo "${line}" | tr '[A-Z]' "[${pattern}]"
 	done
 fi
 
@@ -39,13 +33,14 @@ fi
 if (($uppercase==1))
 then
 	pattern=$(./create_pattern -k ${offset});
-	echo $pattern
+	# echo $pattern
 	while IFS= read -r line
 	do
-		echo ${line} | tr '[a-z]' '[${pattern}]'
+		echo "${line}" | tr '[a-z]' "[${pattern}]"
 	done
 fi
 
-echo $pattern
 # # echo $pattern
+# the quick brown fox jumps over the lazy dog
+# THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
 
