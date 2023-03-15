@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+# declare -a output=$(ls -l);
+# echo $output | fgrep $file
+ls -l | grep "$1" | awk '{print $5}'
