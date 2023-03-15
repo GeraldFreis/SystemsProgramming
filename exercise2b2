@@ -1,0 +1,6 @@
+#!/bin/bash
+
+let n=$1;
+# echo $n
+# let output=$(ls -c);
+ls -c | cut -f $n -d '.'
