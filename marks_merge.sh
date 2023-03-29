@@ -15,20 +15,19 @@ do
     # student1ID=$(cut -d ',' -f1 | cat $);
     student1ID=${student1:0:8};
     student2ID=${student2:0:8};
-
-    if ((student1ID == student2ID))
+    
+    if [ "$student1ID" = "$student2ID" ]
     then
         # echo ${student2:9:10};
         student1+=${student2:8:10};
         echo $student1
-        
+
     else
         student2Exam=${student2:8:10};
-        student2Changed=$student2ID+',-'+$student2Exam;
+        student2Changed=$student2ID',-'$student2Exam;
         echo $student2Changed
         student1+=',-'
         echo $student1
-        echo 'here'
     fi
     # echo $student1;
     # echo $student2
