@@ -3,4 +3,4 @@
 let n=$1;
 # echo $n
 # let output=$(ls -c);
-ls -c | cut -f $n -d '.'
+ls -c | cut -f $1 -d '.' | head -n $1
