@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "name": "macos-clang-arm64",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "//opt/homebrew/Cellar/sfml/2.5.1_1/lib",
+        "/opt/homebrew/Cellar/sfml/2.5.1_1/include",
+        "/opt/homebrew/Cellar/ncurses/6.3/lib",
+        "/opt/homebrew/Cellar/ncurses/6.3/include"
+      ],
+      "compilerPath": "/usr/bin/clang",
+      "cStandard": "${default}",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "macos-clang-arm64",
+      "compilerArgs": [
+        ""
+      ]
+    }
+  ],
+  "version": 4
+}

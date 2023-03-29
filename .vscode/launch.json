@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/geraldfreislich/Desktop/UNI/Year 2/SystemsProgramming",
+      "program": "/Users/geraldfreislich/Desktop/UNI/Year 2/SystemsProgramming/build/Debug/outDebug"
+    }
+  ]
+}
