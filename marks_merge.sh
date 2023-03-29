@@ -20,15 +20,18 @@ do
     then
         # echo ${student2:9:10};
         student1+=${student2:8:10};
-        echo $student1
-
+        # echo $student1
+        echo $student1 >> outfile1.txt
     else
         student2Exam=${student2:8:10};
         student2Changed=$student2ID',-'$student2Exam;
-        echo $student2Changed
+        # echo $student2Changed
         student1+=',-'
-        echo $student1
+        # echo $student1
+        echo $student1 >> outfile1.txt
+        echo $student2Changed >> outfile1.txt
     fi
+
     # echo $student1;
     # echo $student2
 done
