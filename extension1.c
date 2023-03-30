@@ -17,12 +17,8 @@ char **lineSplitter(char *line){
          if(line[i] == ','){
             substrings[substringcounter] = (char *)malloc(sizeof(char*) * (i-low));
             for(int j = low; j < i; j++){
-                // printf("%c", line[j]);
                 substrings[substringcounter][j-low] = line[j];
             }
-
-            // printf("\n");
-            // printf("%s\n", substrings[substringcounter]);
             low = i+1;
             substringcounter++;
         }
@@ -57,7 +53,6 @@ int main() {
             }
             printf("}\n");
         }
-
     }
     printf("]");
     return 0;
