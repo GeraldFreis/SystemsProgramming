@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #define BUFFERSIZE 100
 #define COPYMODE 0644
