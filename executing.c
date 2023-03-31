@@ -5,4 +5,6 @@
 /*
 execute takes in a char ** array and executes it as a command into STDOUT
 */
-void execute()
+void execute(char *array[]){
+   
+}
