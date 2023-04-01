@@ -6,9 +6,10 @@ extern void split_line(char *line, char *address[]); // splits the given line by
 
 int main() {
     char *address[100];
-    char line[] = "This line might work";
+    char line[] = "ls";
     split_line(line, address);
-    for(int i = 0; i < 3; i++){
+    
+    for(int i = 0; i < 4; i++){
         printf("%s\n", address[i]);
     }
 }
