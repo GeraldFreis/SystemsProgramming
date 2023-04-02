@@ -17,10 +17,12 @@ int execute(char *array[]){
     // if all is good
     if(childprocessid == 0){
         // duplicating the input side of the pip into stdout
-        close(file_desmond[0]); close(file_desmond[1]);   
-    } else {
-        close(file_desmond[0]); close(file_desmond[1]);
-    }
+        dup2(file_desmond[1], STDOUT_FILENO);
+        write(file_desmond[1], execvp(array[0], array), 100);
+
+        close(file_desmond[0]); 
+        close(file_desmond[1]);   
+    } 
     
     return 0;
 }

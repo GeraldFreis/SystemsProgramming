@@ -11,7 +11,6 @@ int main() {
     while(gets(line)){
         char *address[100] = {NULL}; // populating the address with nulls
         split_line(line, address);
-        printf("work?");
         int out = execute(address);
     }
 }
