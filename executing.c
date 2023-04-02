@@ -23,6 +23,7 @@ int execute(char *array[]){
         close(file_desmond[0]); 
         close(file_desmond[1]);   
     } 
+    wait(file_desmond);
     
     return 0;
 }
