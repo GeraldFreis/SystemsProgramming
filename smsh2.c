@@ -20,17 +20,32 @@ If we do that we can just take the code from the previous assignment and inject 
 int main()
 {
 	char	*cmdline, *prompt, **arglist;
-	int	result;
+    char ***all_lines;
+	int	result, i=0, counter=0;
 	void	setup();
 
 	prompt = DFL_PROMPT ;
 	setup();
 
 	while ( (cmdline = next_cmd(prompt, stdin)) != NULL ){
-		if ( (arglist = splitline(cmdline)) != NULL  ){
-			result = execute(arglist);
-			freelist(arglist);
-		}
+        int pastindex = 0;
+        for(i = 0; i < strlen(cmdline); i++){
+            if(cmdline[i] == '|'){
+                char *currentline = substr(cmdline, pastindex, i);
+                all_lines[counter] = splitline(currentline);
+                pastindex = i;
+                counter++;
+            }
+        }
+        if(pastindex > 0){
+            char * currentline = substr()
+        }
+		// if ( (arglist = splitline(cmdline)) != NULL  ){
+
+		// 	result = execute(arglist);
+		// 	freelist(arglist);
+		// }
+        // checking if there is a pipe in the 
 		free(cmdline);
 	}
 	return 0;
