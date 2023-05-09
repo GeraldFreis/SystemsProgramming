@@ -116,14 +116,12 @@ char *newstr(char *s, int l)
 	strncpy(rv, s, l);
 	return rv;
 }
-
-void 
-freelist(char **list)
 /*
  * purpose: free the list returned by splitline
  * returns: nothing
  *  action: free all strings in list and then free the list
  */
+void freelist(char **list)
 {
 	char	**cp = list;
 	while( *cp )
