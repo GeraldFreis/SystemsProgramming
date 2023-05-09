@@ -13,14 +13,20 @@ If we do that we can just take the code from the previous assignment and inject 
 #include	<stdlib.h>
 #include	<unistd.h>
 #include	<signal.h>
+#include    <string.h>
 #include	"smsh.h"
+#include "pipeline.c"
+
 
 #define	DFL_PROMPT	"> "
+// extern int pipe_execute(char **[], int);
+char *substr(char *currentline, int b, int e);
+void addNull(char **array);
 
 int main()
 {
 	char	*cmdline, *prompt, **arglist;
-    char ***all_lines;
+    // char ***all_lines = (char ***)malloc(sizeof(char ***) * 100);
 	int	result, i=0, counter=0;
 	void	setup();
 
@@ -28,26 +34,41 @@ int main()
 	setup();
 
 	while ( (cmdline = next_cmd(prompt, stdin)) != NULL ){
+        char ***all_lines = (char ***)malloc(sizeof(char ***) * 100);
+
         int pastindex = 0;
+        int boolibool = 0;
         for(i = 0; i < strlen(cmdline); i++){
             if(cmdline[i] == '|'){
                 char *currentline = substr(cmdline, pastindex, i);
+                // printf("%s\n", currentline);
                 all_lines[counter] = splitline(currentline);
-                pastindex = i;
+                addNull(all_lines[counter]);
+                // printf("%s\n", all_lines[counter][0]);
+                pastindex = i+2; // could be a source of errors in the future
                 counter++;
+                boolibool = 1;
             }
         }
-        if(pastindex > 0){
-            char * currentline = substr()
-        }
-		// if ( (arglist = splitline(cmdline)) != NULL  ){
+        if(boolibool == 1){
+            if(pastindex > 0){
+                char * currentline = substr(cmdline, pastindex, strlen(cmdline));
+                all_lines[counter] = splitline(currentline);
+                counter++;
 
-		// 	result = execute(arglist);
-		// 	freelist(arglist);
-		// }
-        // checking if there is a pipe in the 
-		free(cmdline);
+            }
+        int out = pipe_execute(all_lines, counter);
+        // printf("Here at least\n");
+        } else {
+            if ( (arglist = splitline(cmdline)) != NULL  ){
+                result = execute(arglist);
+                freelist(arglist);
+		    }
+		    free(cmdline);
+        }
+		// free(cmdline);
 	}
+    // free(all_lines);
 	return 0;
 }
 
@@ -65,4 +86,23 @@ void fatal(char *s1, char *s2, int n)
 {
 	fprintf(stderr,"Error: %s,%s\n", s1, s2);
 	exit(n);
+}
+
+char *substr(char *currentline, int b, int e){
+    char *returnstring = (char * )malloc(sizeof(char * ) * strlen(currentline));
+    int i  = 0, counter = 0;
+    for(i = b; i < e; i++){
+        returnstring[counter] = currentline[i];
+        counter++;
+    }
+    // printf("%s\n", returnstring);
+    return returnstring;
+}
+
+void addNull(char **array){
+    int counter = 0;
+    while(array[counter] != NULL){
+        counter++;
+    }
+    array[counter] = NULL; // ensuring that the array is null terminated
 }
