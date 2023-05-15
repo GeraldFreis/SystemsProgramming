@@ -49,23 +49,25 @@ int main()
                         break;
                     }
                 }
+                char *strline = substr(cmdline, i, j);
+                char *command = substr(cmdline, pastindex, i);
                 char **line = (char **)malloc(sizeof(char **) * 3);
-                line[1] = substr(cmdline, i, j);
-                line[0] = substr(cmdline, pastindex, i);
-
+                line[0] = command; line[1] = strline;
                 all_lines[counter]=line;
                 addNull(all_lines[counter]);
 
-                i=j+1;   
+                i+=j+1;   
                 pastindex=i+2;
                 counter++;
+                // boolibool = 1;
 
             }
-            else if(cmdline[i] == '|'){
+            if(cmdline[i] == '|'){
                 char *currentline = substr(cmdline, pastindex, i);
                 // printf("%s\n", currentline);
                 all_lines[counter] = splitline(currentline);
                 addNull(all_lines[counter]);
+                // printf("%s\n", all_lines[counter][0]);
                 pastindex = i+2; // could be a source of errors in the future
                 counter++;
                 boolibool = 1;

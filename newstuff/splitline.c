@@ -10,6 +10,8 @@
 #include	<string.h>
 #include	"smsh.h"
 
+
+
 char * next_cmd(char *prompt, FILE *fp)
 /*
  * purpose: read next command line from fp
@@ -26,6 +28,7 @@ char * next_cmd(char *prompt, FILE *fp)
 
 	printf("%s", prompt);				/* prompt user	*/
 	while( ( c = getc(fp)) != EOF ) {
+		// printf("%c\n", c);
 		/* need space? */
 		if( pos+1 >= bufspace ){		/* 1 for \0	*/
 			if ( bufspace == 0 )		/* y: 1st time	*/
