@@ -7,7 +7,7 @@
 
 /*
 Function to execute pipes when given a triple array pointer*/
-int pipe_execute(char **given_array[], int lines)
+int pipe_execute(char **given_array, int lines)
 {
     if(lines == 1) {execute(given_array[0]); return 0;}
     
@@ -41,9 +41,7 @@ int pipe_execute(char **given_array[], int lines)
             if(this_process == -1) {return -1; /* mission failed */}
 
             if(this_process == 0){
-                // we are in the child (not literally)
                 
-                // fprintf(stdout, "\n");
                 
                 // getting the previous pipe input if we are not at i = 0
                 if(i != 0) { dup2(file_descriptors[i-1][0], STDIN_FILENO); }

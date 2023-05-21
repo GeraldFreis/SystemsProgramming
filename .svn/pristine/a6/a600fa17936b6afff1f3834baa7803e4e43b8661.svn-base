@@ -1,0 +1,106 @@
+/**  smsh1.c  small-shell version 1
+ **     first really useful version after prompting shell
+ **     this one parses the command line into strings
+ **     uses fork, exec, wait, and ignores signals
+ **/
+
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <unistd.h>
+#include    <signal.h>
+#include    "smsh.h"
+#include    <string.h> // for strlen
+
+#define DFL_PROMPT  "> "
+#define is_delim(x) ((x) == ' ' || (x) == '\t')
+char **my_splitline(char *line); // This function is my own implementation of splitline can be found below 
+static int _command_counter;
+int pipe_execute(char *argv[]);
+
+int main()
+{
+    char    *cmdline, *prompt, **arglist;
+    int result;
+    void    setup();
+
+    prompt = DFL_PROMPT ;
+    setup();
+    _command_counter = 0;
+    while ( (cmdline = next_cmd(prompt, stdin)) != NULL ){
+        if ( (arglist = my_splitline(cmdline)) != NULL  ){
+            result = pipe_execute(arglist);
+            freelist(arglist);
+        }
+        free(cmdline);
+    }
+    return 0;
+}
+
+void setup()
+/*
+ * purpose: initialize shell
+ * returns: nothing. calls fatal() if trouble
+ */
+{
+    signal(SIGINT,  SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+}
+
+void fatal(char *s1, char *s2, int n)
+{
+    fprintf(stderr,"Error: %s,%s\n", s1, s2);
+    exit(n);
+}
+
+/*Requires a char * as formal parameter */
+char **my_splitline(char *line){
+   char *newstr();
+    char    **args ;
+    int spots = 0;          /* spots in table   */
+    int bufspace = 0;           /* bytes in table   */
+    int argnum = 0;         /* slots used       */
+    char    *cp = line;         /* pos in string    */
+    char    *start;
+    int len;
+
+    if ( line == NULL )         /* handle special case  */
+        return NULL;
+
+    args     = emalloc(BUFSIZ);     /* initialize array */
+    bufspace = BUFSIZ;
+    spots    = BUFSIZ/sizeof(char *);
+
+    while( *cp != '\0' )
+    {
+        while ( is_delim(*cp) )     /* skip leading spaces  */
+            cp++;
+        if ( *cp == '\0' )      /* quit at end-o-string */
+            break;
+
+        /* make sure the array has room (+1 for NULL) */
+        if ( argnum+1 >= spots ){
+            args = erealloc(args,bufspace+BUFSIZ);
+            bufspace += BUFSIZ;
+            spots += (BUFSIZ/sizeof(char *));
+        }
+
+        /* mark start, then find end of word */
+        start = cp;
+        len   = 1;
+        while (*++cp != '\0' && !(is_delim(*cp)) )
+            len++;
+        args[argnum++] = newstr(start, len);
+    }
+    args[argnum] = NULL;
+    return args;
+
+}
+
+
+int pipe_execute(char *argv[]){
+    int i = 0;
+    while(argv[i] != NULL){
+        printf("%s\n", argv[i]); i++;
+    }
+    return 0;
+}

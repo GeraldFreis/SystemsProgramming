@@ -1,0 +1,6 @@
+part1:  smsh2.c 
+	gcc -o smsh2 smsh2.c splitline.c execute.c
+
+prepart1: smsh1.c execute.c splitline.c
+	gcc -o smsh1 execute.c splitline.c smsh1.c
+	./smsh1
