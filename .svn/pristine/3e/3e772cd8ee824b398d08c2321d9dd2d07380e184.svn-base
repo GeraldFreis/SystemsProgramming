@@ -12,6 +12,7 @@
 #include    <sys/types.h>
 #include    <sys/wait.h>
 #include    "smsh.h"
+#include    <fcntl.h>
 
 #define DFL_PROMPT  "> "
 #define BUFFSIZE 100
@@ -138,6 +139,23 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
             }
 
             char **commands = tokenizer(array[i]); // this just ensures that we have no spaces (problem with the parser is that there are sometimes spaces)
+            
+            int j = 0;
+            for(j = 0; j < _commands_amount; j++){
+                if(commands[j] == "<"){close(STDIN_FILENO); open(commands[j+1], O_RDONLY); break;} // setting up to read from the next command
+                else if(commands[j] == ">"){
+                    close(STDOUT_FILENO); 
+                    if(open(commands[j+1], O_CREAT , S_IRWXG) < 0){
+                        open(commands[j+1], O_WRONLY, S_IRWXG); // if we cannot create the file because it already exists we just write into it
+                    }
+                    break;
+                }
+            }
+
+            if(j != _commands_amount - 1){ // setting the value where the redirection occurs to null because we do not actually want to execute it
+                commands[j] = NULL;
+            }
+
             signal(SIGINT, SIG_DFL);
             signal(SIGQUIT, SIG_DFL);
             execvp(commands[0], commands);

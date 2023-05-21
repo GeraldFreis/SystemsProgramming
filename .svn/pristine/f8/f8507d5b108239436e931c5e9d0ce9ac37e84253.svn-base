@@ -100,6 +100,7 @@ char **tokenizer(char *line){ // i like string tok
     char *tk = strtok(line, " ");
     while(tk != NULL){
         commands[i] = tk; 
+        // printf("%s\n", commands[i]);
         ++i;
         tk=strtok(NULL, " ");
     }
@@ -137,7 +138,7 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
                 dup2(pipes[1][0], STDIN_FILENO); close(pipes[1][0]); close(pipes[1][1]);
             }
 
-            char **commands = tokenizer(array[i]); // this just ensures that we have no spaces (problem with the parser is that there are sometimes spaces)
+            char **commands = tokenizer(array[i]); // this just ensures that we have no spaces
             signal(SIGINT, SIG_DFL);
             signal(SIGQUIT, SIG_DFL);
             execvp(commands[0], commands);
@@ -147,9 +148,9 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
             free(commands);
 
         } else { // if we in the parent
-            if(i >= 1){close(pipes[1][0]); close(pipes[1][1]);} // if not first
-            if(i < _commands_amount -1){pipes[1][0] = pipes[0][0]; pipes[1][1] = pipes[0][1];} // if not last
-            if(wait(&child_info) == -1){perror("wait");} // waiting otherwise everything will be out of order
+            if(i -1 >= 0){close(pipes[1][0]); close(pipes[1][1]);}
+            if(i + 1< _commands_amount){pipes[1][0] = pipes[0][0]; pipes[1][1] = pipes[0][1];}
+            if(wait(&child_info) == -1){perror("wait");}
             
         }
     }

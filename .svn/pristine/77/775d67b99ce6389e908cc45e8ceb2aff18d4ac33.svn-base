@@ -12,12 +12,14 @@
 #include    <sys/types.h>
 #include    <sys/wait.h>
 #include    "smsh.h"
+#include    <fcntl.h>
 
 #define DFL_PROMPT  "> "
 #define BUFFSIZE 100
 char **my_splitline(char *line);
 int my_piping_function_kinda_similar_to_last_assignment(char **array); // piping function
 static int _commands_amount;
+static int _commands_in_line;
 int main()
 {
     char    *cmdline, *prompt, **arglist;
@@ -100,10 +102,12 @@ char **tokenizer(char *line){ // i like string tok
     char *tk = strtok(line, " ");
     while(tk != NULL){
         commands[i] = tk; 
+        // printf("%s\n", commands[i]);
         ++i;
         tk=strtok(NULL, " ");
     }
     commands[i] = NULL;
+    _commands_in_line = i;
     return commands;
 
 }
@@ -138,6 +142,23 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
             }
 
             char **commands = tokenizer(array[i]); // this just ensures that we have no spaces (problem with the parser is that there are sometimes spaces)
+            // printf("%d\n", _commands_in_line);
+            int j = 0;
+            for(j = 0; j < _commands_in_line; j++){ // commands in line is a static derived from the amount of commands tokenized in the tokenizer function
+                if(commands[j] == "<"){close(STDIN_FILENO); open(commands[j+1], O_RDONLY); break;} // setting up to read from the next command
+                else if(commands[j] == ">"){
+                    close(STDOUT_FILENO); fclose(stderr);
+                    if(open(commands[j+1], O_CREAT , S_IRWXG) < 0){
+                        open(commands[j+1], O_WRONLY, S_IRWXG); // if we cannot create the file because it already exists we just write into it
+                    }
+                    break;
+                }
+            }
+
+            if(j != _commands_amount - 1){ // setting the value where the redirection occurs to null because we do not actually want to execute it
+                commands[j] = NULL;
+            }
+
             signal(SIGINT, SIG_DFL);
             signal(SIGQUIT, SIG_DFL);
             execvp(commands[0], commands);
