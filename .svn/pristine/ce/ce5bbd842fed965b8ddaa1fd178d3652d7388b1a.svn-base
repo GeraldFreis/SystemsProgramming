@@ -13,6 +13,7 @@
 #include    <sys/wait.h>
 #include    "smsh.h"
 #include    <fcntl.h>
+#include    <glob.h>
 
 #define DFL_PROMPT  "> "
 #define BUFFSIZE 100
@@ -141,29 +142,54 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
                 dup2(pipes[1][0], STDIN_FILENO); close(pipes[1][0]); close(pipes[1][1]);
             }
 
-            // fclose(stderr); // no stderrors thanks
+            fclose(stderr); // no stderrors thanks I do not want to hear it
             char **commands = tokenizer(array[i]); // this just ensures that we have no spaces (problem with the parser is that there are sometimes spaces)
             
             int j = 0;
-            int deadindex = 0;
+            // redirection section
             for(j = 0; j < _commands_in_line; j++){ // commands in line is a static derived from the amount of commands tokenized in the tokenizer function
                 // printf("%s\n", commands[j]);
                 char first = commands[j][0];
-                if(first == '<'){ close(STDIN_FILENO); open(commands[j+1], O_RDONLY); deadindex=j /*If Im honest i have no clue why i have to make it null here */;break; } // setting up to read from the next command
+                if(first == '<'){ close(STDIN_FILENO); open(commands[j+1], O_RDONLY); break; } // setting up to read from the next command
                 
                 else if(first == '>'){
 
                     close(STDOUT_FILENO); 
 
-                    creat(commands[j+1], S_IRUSR | S_IWUSR); // i use create because Im cool and don't need to use anything else
-                    deadindex = j; // making sure that we set the current command to null so that we don't have it running again in execvp otherwise we mess up the command callllllll
+                    if(open(commands[j+1], O_CREAT , S_IRWXG | S_IRWXU) < 0){
+                        open(commands[j+1], O_WRONLY, S_IRWXG | S_IRWXU); // if we cannot create the file because it already exists we just write into it
+                    }
                     break;
                 }
             }
 
-            // for some reason it didnt like it 
-            if(deadindex != 0){ // setting the value where the redirection occurs to null because we do not actually want to execute it
-                commands[deadindex] = NULL;
+            if(j != _commands_amount - 1){ // setting the value where the redirection occurs to null because we do not actually want to execute it
+                commands[j] = NULL;
+            }
+
+            // globbing section
+            for(j = 0; j < _commands_in_line; j++) // iterating across all commands
+            {
+                int k = 0;
+
+                for(k = 0; k < strlen(commands[j]); k++)
+                {
+                    if(commands[j][k] == '*') // if we have stumbled upon a humble little asterisk
+                    {
+                        glob_t globber;
+                        char *commandtofind = commands[j];
+                        globber.gl_offs = 1; // this controls how wide the search goes (if its 0 nothing is displayed, if it is 2 then wayyyy too many stuff is shown)
+                        glob(commandtofind, GLOB_DOOFFS, NULL, &globber); // IDEK why but GLOB_MARK didnt display the first value
+                        // now we actually need to set the path
+                        globber.gl_pathv[0] = commands[0];
+                        signal(SIGINT, SIG_DFL); // signalling that we want a single signal to the signal warehouse where signals signal
+                        signal(SIGQUIT, SIG_DFL);
+                        execvp(globber.gl_pathv[0], &globber.gl_pathv[0]); // executing the globber variables, because we have set it up to execute the command attached
+                        perror("cannot execute command");
+                        exit(1);
+
+                    }
+                }
             }
 
             signal(SIGINT, SIG_DFL);
@@ -182,7 +208,5 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
 
         }
     }
-
-
     return child_info;
 }

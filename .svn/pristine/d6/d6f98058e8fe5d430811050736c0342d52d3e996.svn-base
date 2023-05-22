@@ -141,29 +141,29 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
                 dup2(pipes[1][0], STDIN_FILENO); close(pipes[1][0]); close(pipes[1][1]);
             }
 
-            // fclose(stderr); // no stderrors thanks
+            fclose(stderr); // no stderrors thanks
             char **commands = tokenizer(array[i]); // this just ensures that we have no spaces (problem with the parser is that there are sometimes spaces)
             
             int j = 0;
-            int deadindex = 0;
+            
             for(j = 0; j < _commands_in_line; j++){ // commands in line is a static derived from the amount of commands tokenized in the tokenizer function
                 // printf("%s\n", commands[j]);
                 char first = commands[j][0];
-                if(first == '<'){ close(STDIN_FILENO); open(commands[j+1], O_RDONLY); deadindex=j /*If Im honest i have no clue why i have to make it null here */;break; } // setting up to read from the next command
+                if(first == '<'){ close(STDIN_FILENO); open(commands[j+1], O_RDONLY); break; } // setting up to read from the next command
                 
                 else if(first == '>'){
 
                     close(STDOUT_FILENO); 
 
-                    creat(commands[j+1], S_IRUSR | S_IWUSR); // i use create because Im cool and don't need to use anything else
-                    deadindex = j; // making sure that we set the current command to null so that we don't have it running again in execvp otherwise we mess up the command callllllll
+                    if(open(commands[j+1], O_CREAT | O_WRONLY, S_IRWXG | S_IRWXU) < 0){
+                        open(commands[j+1], O_WRONLY, S_IRWXG | S_IRWXU); // if we cannot create the file because it already exists we just write into it
+                    }
                     break;
                 }
             }
 
-            // for some reason it didnt like it 
-            if(deadindex != 0){ // setting the value where the redirection occurs to null because we do not actually want to execute it
-                commands[deadindex] = NULL;
+            if(j != _commands_amount - 1){ // setting the value where the redirection occurs to null because we do not actually want to execute it
+                commands[j] = NULL;
             }
 
             signal(SIGINT, SIG_DFL);
