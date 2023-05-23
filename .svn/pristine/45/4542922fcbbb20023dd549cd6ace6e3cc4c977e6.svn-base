@@ -16,14 +16,14 @@
 
 #define DFL_PROMPT  "> "
 #define BUFFSIZE 100
-char **my_splitline(char *line); // just an adapted version of the splitline that can handle piping
+char **my_splitline(char *line);
 int my_piping_function_kinda_similar_to_last_assignment(char **array); // piping function
-static int _commands_amount; // this static will count the amount of commands parsed in
-static int _commands_in_line; // this static will count the amount of arguments and commands in a line
+static int _commands_amount;
+static int _commands_in_line;
 int main()
 {
     char    *cmdline, *prompt, **arglist;
-    int     result;
+    int result;
     void    setup();
 
     prompt = DFL_PROMPT ;
@@ -32,15 +32,10 @@ int main()
     while ( (cmdline = next_cmd(prompt, stdin)) != NULL ){
         if ( (arglist = my_splitline(cmdline)) != NULL  ){
             result = my_piping_function_kinda_similar_to_last_assignment(arglist);
-            freelist(arglist);
+            // freelist(arglist);
         }
-        // cmdline = NULL;
-        fclose(stderr); // this is just here because sometimes an error is created, but the code will still pass the test case fine (I want the output to look pretty (you can view the weird output in my submission 170))
-        if(cmdline != NULL && cmdline != "\0" && strlen(cmdline) > 2){ // sometimes theres a weird memory bug that happens where it tries to free an invalid pointer so we'll check that this is valid first
-            free(cmdline);
-        }
+        // free(cmdline);
     }
-    free(cmdline);
     return 0;
 }
 
@@ -91,7 +86,7 @@ char **my_splitline(char *line){
         /* mark start, then find end of word */
         start = cp;
         len   = 1;
-        while (*++cp != '\0' && *cp != '|') // if we are not currently on the last character and we arent currently one a piping character we can increment the length
+        while (*++cp != '\0' && *cp != '|')
             len++;
         args[_commands_amount++] = newstr(start, len);
     }
@@ -136,20 +131,28 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
         if(i < _commands_amount - 1){
             pipe(pipes[0]);
         }
-        char **commands = tokenizer(array[i]); // this just ensures that we have no spaces (problem with the parser is that there are sometimes spaces)
         pid = fork(); // forking now
         if(pid < 0){return -1;} // if error we return :(
 
         if(pid == 0){ // if we in the kid (not literally (not this time (comp sci pub crawl was cool (kinda))))
 
+            //closing up everything that needs to be closed and duplicating
+            if(i < _commands_amount - 1){
+                close(pipes[0][0]); dup2(pipes[0][1], STDOUT_FILENO); close(pipes[0][1]);
+            }
+            if(i >= 1){ // if not the first
+                dup2(pipes[1][0], STDIN_FILENO); close(pipes[1][0]); close(pipes[1][1]);
+            }
+
+            // fclose(stderr); // no stderrors thanks
+            char **commands = tokenizer(array[i]); // this just ensures that we have no spaces (problem with the parser is that there are sometimes spaces)
             
             int j = 0;
-            int deadindex = -1;
+            int deadindex = 0;
             for(j = 0; j < _commands_in_line; j++){ // commands in line is a static derived from the amount of commands tokenized in the tokenizer function
                 char first = commands[j][0];
-                // printf("%c\n", first);
-
-                if(first == '<'){ close(STDIN_FILENO); open(commands[j+1], O_RDONLY); deadindex=j /*If Im honest i have no clue why i have to make it null here  (I DONT) */;break; } // setting up to read from the next command
+                
+                if(first == '<'){ close(STDIN_FILENO); open(commands[j+1], O_RDONLY); deadindex=j /*If Im honest i have no clue why i have to make it null here */;break; } // setting up to read from the next command
                 
                 else if(first == '>'){
 
@@ -160,19 +163,8 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
                 }
             }
 
-            //closing up everything that needs to be closed and duplicating the filestreams
-            if(i < _commands_amount - 1){ // if we are not on the last command we can duplicate the new stdin to stdout and then close it
-                close(pipes[0][0]); dup2(pipes[0][1], STDOUT_FILENO); close(pipes[0][1]);
-            }
-            if(i >= 1){ // if not the first
-                dup2(pipes[1][0], STDIN_FILENO); close(pipes[1][0]); close(pipes[1][1]);
-            }
-
-            fclose(stderr); // no stderrors thanks (I don't want to hear it)
-            
-
             // for some reason it didnt like it 
-            if(deadindex != -1){ // setting the value where the redirection occurs to null because we do not actually want to execute it
+            if(deadindex != 0){ // setting the value where the redirection occurs to null because we do not actually want to execute it
                 commands[deadindex] = NULL;
             }
 
@@ -182,7 +174,7 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
             perror("cannot execute command"); // if we are here we should not be (this is because execvp returned -1 instead of taking over the forked process)
             exit(1);
 
-            // free(commands); // I do like to free
+            // free(commands);
 
         } else { // if we in the parent (muah)
 
@@ -191,7 +183,6 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
             if(wait(&child_info) == -1){perror("wait");} // waiting otherwise everything will be out of order   
 
         }
-        free(commands);
     }
 
     return child_info; // returning the kids to the village (at least their passports)

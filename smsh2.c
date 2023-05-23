@@ -53,7 +53,7 @@ void fatal(char *s1, char *s2, int n)
     exit(n);
 }
 
-#define is_delim(x) ((x)==' '|| (x)=='\t' || (x) == '|') // making my life easy
+#define is_delim(x) ((x)==' '|| (x)=='\t' || (x) == '|') // making my life easy by including the pipe character as a delimeter
 #define is_end(x) ((x) == '\0' || (x) == '|')
 /* My functions */
 char **my_splitline(char *line){
@@ -69,7 +69,7 @@ char **my_splitline(char *line){
 
     while( *cp != '\0' ) // before end of line
     {
-        while ( is_delim(*cp) )     /* skip leading spaces  */
+        while ( is_delim(*cp) )     /* skip leading spaces  and piping characters*/
             cp++;
         if ( *cp == '\0' )      /* quit at end-o-string */
             break;
@@ -84,7 +84,7 @@ char **my_splitline(char *line){
         /* mark start, then find end of word */
         start = cp;
         len   = 1;
-        while (*++cp != '\0' && *cp != '|')
+        while (*++cp != '\0' && *cp != '|') // creating a new word between each whitespace and piping signal
             len++;
         args[_commands_amount++] = newstr(start, len);
     }
@@ -94,12 +94,14 @@ char **my_splitline(char *line){
     return args;
 }
 
+// tokenizer because sometimes there are extraneous white spaces at the end of the word and we need to get rid of them otherwise execvp will have a hissy fit
 char **tokenizer(char *line){ // i like string tok
     int i = 0;
-    char **commands = malloc(sizeof(char *) * BUFFSIZE);
+    char **commands = malloc(sizeof(char *) * BUFFSIZE); // allocating enough space (no more than 100 chars)
     char *tk = strtok(line, " ");
-    while(tk != NULL){
-        commands[i] = tk; 
+    while(tk != NULL){ // iterating until the token is null
+        commands[i] = tk; // setting the current command to the tokenised string
+        // printf("%s\n", commands[i]);
         ++i;
         tk=strtok(NULL, " ");
     }
@@ -130,10 +132,10 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
         if(pid == 0){ // if we in the kid
 
             //closing up everything that needs to be closed and duplicating
-            if(i < _commands_amount - 1){
+            if(i < _commands_amount - 1){ // if we arent on the last command we want to duplicate the new output file descriptor into stdout
                 close(pipes[0][0]); dup2(pipes[0][1], STDOUT_FILENO); close(pipes[0][1]);
             }
-            if(i >= 1){ // if not the first
+            if(i >= 1){ // if not the first we want to duplicate the old input file descriptor into stdin so we can read from it next pipe
                 dup2(pipes[1][0], STDIN_FILENO); close(pipes[1][0]); close(pipes[1][1]);
             }
 
@@ -147,8 +149,8 @@ int my_piping_function_kinda_similar_to_last_assignment(char **array){
             free(commands);
 
         } else { // if we in the parent
-            if(i >= 1){close(pipes[1][0]); close(pipes[1][1]);} // if not first
-            if(i < _commands_amount -1){pipes[1][0] = pipes[0][0]; pipes[1][1] = pipes[0][1];} // if not last
+            if(i >= 1){close(pipes[1][0]); close(pipes[1][1]);} // if not first we want to close the old pipes
+            if(i < _commands_amount -1){pipes[1][0] = pipes[0][0]; pipes[1][1] = pipes[0][1];} // if not last we want to set the new pipes to be the old pipes for the next process
             if(wait(&child_info) == -1){perror("wait");} // waiting otherwise everything will be out of order
             
         }

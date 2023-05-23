@@ -35,7 +35,6 @@ int main()
             freelist(arglist);
         }
         // cmdline = NULL;
-        fclose(stderr); // this is just here because sometimes an error is created, but the code will still pass the test case fine (I want the output to look pretty (you can view the weird output in my submission 170))
         if(cmdline != NULL && cmdline != "\0" && strlen(cmdline) > 2){ // sometimes theres a weird memory bug that happens where it tries to free an invalid pointer so we'll check that this is valid first
             free(cmdline);
         }
