@@ -15,8 +15,8 @@
 
 #define DFL_PROMPT  "> "
 #define BUFFSIZE 100
-char **my_splitline(char *line); // my adaptation of the splitline function
-int my_piping_function(char **array); // piping function
+char **my_splitline(char *line);
+int my_piping_function_kinda_similar_to_last_assignment(char **array); // piping function
 static int _commands_amount;
 int main()
 {
@@ -29,7 +29,7 @@ int main()
     _commands_amount = 0;
     while ( (cmdline = next_cmd(prompt, stdin)) != NULL ){
         if ( (arglist = my_splitline(cmdline)) != NULL  ){
-            result = my_piping_function(arglist); // executing the pipes
+            result = my_piping_function_kinda_similar_to_last_assignment(arglist); // executing the pipes
             freelist(arglist);
         }
         free(cmdline);
@@ -111,7 +111,7 @@ char **tokenizer(char *line){ // i like string tok
 }
 
 /* requires _commands_amount to be initialised */
-int my_piping_function(char **array){
+int my_piping_function_kinda_similar_to_last_assignment(char **array){
     int pid;
     int child_info = -1;
 
